@@ -32,9 +32,9 @@ export const Footer = () => {
 
           {/* Verified Health Authorities */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-teal-400 mb-3">
+            <h3 className="text-sm font-semibold text-teal-400 mb-3">
               Trusted Public Sources
-            </h4>
+            </h3>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
                 <a href="https://www.who.int" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
@@ -61,9 +61,9 @@ export const Footer = () => {
 
           {/* Technology & Architecture */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-teal-400 mb-3">
+            <h3 className="text-sm font-semibold text-teal-400 mb-3">
               Platform Architecture
-            </h4>
+            </h3>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>Google Gemini API</li>
               <li>Firecrawl Healthcare Extraction</li>
@@ -75,9 +75,9 @@ export const Footer = () => {
 
           {/* Safety & Compliance */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-teal-400 mb-3">
+            <h3 className="text-sm font-semibold text-teal-400 mb-3">
               Safety & Governance
-            </h4>
+            </h3>
             <p className="text-xs text-slate-400 leading-relaxed mb-3">
               Designed according to health literacy standards with zero diagnostic claims and isolated patient memory encryption.
             </p>

@@ -95,7 +95,7 @@ export const Navbar = () => {
               <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-brand-700 transition-colors">
                 CareGuide <span className="text-brand-600 font-extrabold">AI</span>
               </span>
-              <span className="text-[10px] font-medium tracking-wide text-slate-500 uppercase -mt-1">
+              <span className="text-[11px] font-medium text-slate-500 -mt-0.5">
                 Patient Companion
               </span>
             </div>
@@ -129,7 +129,13 @@ export const Navbar = () => {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-medium text-slate-700">
                   <User className="w-3.5 h-3.5 text-brand-600" />
-                  <span className="max-w-[140px] truncate">{user.email}</span>
+                  <span
+                    className="max-w-[220px] sm:max-w-none truncate"
+                    title={user.email}
+                    aria-label={`Signed in as ${user.email}`}
+                  >
+                    {user.email}
+                  </span>
                 </div>
                 <button
                   onClick={handleLogout}

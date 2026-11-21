@@ -154,21 +154,28 @@ function ChatContent() {
       {/* Chat Header Toolbar */}
       <div className="flex flex-wrap items-center justify-between pb-4 border-b border-slate-200/80 gap-3">
         <div className="flex items-center gap-3">
+          <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-brand-600" aria-hidden="true" />
+            <span>AI Patient Companion</span>
+          </h1>
+
+          <span className="text-slate-300 hidden sm:inline" aria-hidden="true">|</span>
+
           <button
             onClick={handleNewConversation}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs shadow-sm transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
           >
-            <PlusCircle className="w-3.5 h-3.5" />
+            <PlusCircle className="w-3.5 h-3.5" aria-hidden="true" />
             New Chat
           </button>
 
           {messages.length > 0 && (
             <button
               onClick={handleClearCurrentConversation}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
               title="Clear Conversation"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
               Clear
             </button>
           )}
@@ -332,13 +339,14 @@ function ChatContent() {
                   )}
 
                   {/* Footer actions for message */}
-                  <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-50">
+                  <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-50">
                     <span>CareGuide AI grounded response</span>
                     <button
                       onClick={() => handleCopyText(msg.id, msg.content)}
-                      className="flex items-center gap-1 hover:text-slate-600 transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 text-xs font-medium transition-colors"
+                      title="Copy message to clipboard"
                     >
-                      <Copy className="w-3 h-3" />
+                      <Copy className="w-3.5 h-3.5" />
                       {copiedId === msg.id ? 'Copied' : 'Copy'}
                     </button>
                   </div>
@@ -373,14 +381,15 @@ function ChatContent() {
           />
 
           <div className="flex items-center justify-between pt-1 px-2 border-t border-slate-100">
-            <span className="text-[11px] text-slate-400">
+            <span className="text-xs text-slate-500">
               Press Enter to send • Shift+Enter for new line
             </span>
             <button
               onClick={() => handleSendMessage()}
               disabled={!inputText.trim() || loading}
-              className="p-2.5 rounded-xl bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-40 transition-all shadow-sm"
+              className="inline-flex items-center justify-center p-2.5 rounded-xl bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-40 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
               title="Send Message"
+              aria-label="Send Message"
             >
               <Send className="w-4 h-4" />
             </button>
