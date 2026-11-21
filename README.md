@@ -116,6 +116,17 @@ Open `http://localhost:3000` to interact with CareGuide AI.
 
 ---
 
+## Production Deployment
+
+CareGuide AI is production-ready for free, 1-click cloud deployment:
+- **Backend (FastAPI):** Deployable on [Render](https://render.com) via `render.yaml` or Docker (`backend/Dockerfile`).
+- **Frontend (Next.js):** Deployable on [Vercel](https://vercel.com) via `frontend/vercel.json`.
+- **Database & Auth:** Hosted on [Supabase](https://supabase.com).
+
+For full step-by-step instructions, see the **[Production Deployment Guide](docs/deployment.md)**.
+
+---
+
 ## License
 
 This project is created for educational and academic Generative AI development purposes.
