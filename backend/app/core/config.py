@@ -18,8 +18,8 @@ class Settings(BaseSettings):
 
     # Google Gemini API
     GEMINI_API_KEY: Optional[str] = None
-    GEMINI_MODEL: str = "gemini-1.5-flash"
-    EMBEDDING_MODEL: str = "text-embedding-004"
+    GEMINI_MODEL: str = "gemini-3-flash-preview"
+    EMBEDDING_MODEL: str = "gemini-embedding-001"
     EMBEDDING_DIMENSION: int = 768
 
     # Firecrawl

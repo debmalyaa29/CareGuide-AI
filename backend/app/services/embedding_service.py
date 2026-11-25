@@ -24,7 +24,7 @@ def get_genai_client():
 
 
 class EmbeddingService:
-    def __init__(self, model_name: str = "text-embedding-004", dimension: int = 768):
+    def __init__(self, model_name: str = "gemini-embedding-001", dimension: int = 768):
         self.model_name = model_name
         self.dimension = dimension
 
@@ -56,13 +56,18 @@ class EmbeddingService:
                 # Use Google GenAI SDK embed content
                 response = client.models.embed_content(
                     model=self.model_name,
-                    contents=clean_text
+                    contents=clean_text,
+                    config={"output_dimensionality": self.dimension},
                 )
-                if response and hasattr(response, "embedding") and response.embedding:
+                values = None
+                if response and hasattr(response, "embeddings") and response.embeddings:
+                    values = response.embeddings[0].values
+                elif response and hasattr(response, "embedding") and response.embedding:
                     values = response.embedding.values
+
+                if values:
                     if len(values) == self.dimension:
                         return list(values)
-                    # If dimension differs, pad or truncate
                     padded = (list(values) + [0.0] * self.dimension)[:self.dimension]
                     return padded
             except Exception as e:

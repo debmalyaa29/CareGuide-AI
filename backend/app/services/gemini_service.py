@@ -146,32 +146,45 @@ Generate a personalized, grounded explanation in JSON format complying strictly 
         suggested_follow_ups: List[str] = []
 
         if client and settings.GEMINI_API_KEY:
-            try:
-                # Use Google GenAI SDK
-                response = client.models.generate_content(
-                    model=self.model_name,
-                    contents=[
-                        {"role": "user", "parts": [{"text": SYSTEM_PROMPT + "\n\n" + user_prompt}]}
-                    ]
-                )
-                raw_text = response.text if hasattr(response, "text") else str(response)
+            candidate_models = []
+            for m in [self.model_name, "gemini-3-flash-preview", "gemini-flash-latest", "gemini-3.5-flash"]:
+                if m and m not in candidate_models:
+                    candidate_models.append(m)
 
-                # Parse JSON output from Gemini
-                cleaned_text = re.sub(r"^```(?:json)?\s*", "", raw_text.strip())
-                cleaned_text = re.sub(r"\s*```$", "", cleaned_text)
-                parsed = json.loads(cleaned_text)
+            last_error = None
+            for model_id in candidate_models:
+                try:
+                    response = client.models.generate_content(
+                        model=model_id,
+                        contents=[
+                            {"role": "user", "parts": [{"text": SYSTEM_PROMPT + "\n\n" + user_prompt}]}
+                        ],
+                        config={"response_mime_type": "application/json"},
+                    )
+                    raw_text = response.text if hasattr(response, "text") else str(response)
 
-                reply_content = parsed.get("reply")
-                is_emergency = is_emergency or parsed.get("is_emergency", False)
-                if parsed.get("emergency_notice"):
-                    emergency_notice = parsed.get("emergency_notice")
+                    # Parse JSON output from Gemini
+                    cleaned_text = re.sub(r"^```(?:json)?\s*", "", raw_text.strip())
+                    cleaned_text = re.sub(r"\s*```$", "", cleaned_text)
+                    parsed = json.loads(cleaned_text)
 
-                for item in parsed.get("medical_terms", []):
-                    medical_terms.append(MedicalTermDefinition(term=item.get("term", ""), definition=item.get("definition", "")))
+                    reply_content = parsed.get("reply")
+                    is_emergency = is_emergency or parsed.get("is_emergency", False)
+                    if parsed.get("emergency_notice"):
+                        emergency_notice = parsed.get("emergency_notice")
 
-                suggested_follow_ups = parsed.get("suggested_follow_ups", [])
-            except Exception as e:
-                logger.warning(f"Gemini API invocation failed: {e}. Utilizing verified RAG synthesis fallback.")
+                    for item in parsed.get("medical_terms", []):
+                        medical_terms.append(MedicalTermDefinition(term=item.get("term", ""), definition=item.get("definition", "")))
+
+                    suggested_follow_ups = parsed.get("suggested_follow_ups", [])
+                    if reply_content:
+                        break
+                except Exception as e:
+                    last_error = e
+                    logger.warning(f"Gemini model '{model_id}' failed: {e}")
+
+            if not reply_content and last_error:
+                logger.warning(f"All Gemini models failed ({last_error}). Utilizing verified RAG synthesis fallback.")
 
         # Resilient Synthesis Fallback if API key pending or network interrupted
         if not reply_content:
