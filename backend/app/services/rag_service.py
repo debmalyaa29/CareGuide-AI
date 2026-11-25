@@ -149,7 +149,32 @@ class RAGService:
             }
         ]
 
+        existing_urls = set()
+        client = get_supabase_admin_client()
+        if client:
+            try:
+                res = client.table("health_documents").select("id, source_url, title, source_domain, summary, created_at").execute()
+                for row in (res.data or []):
+                    url = row.get("source_url")
+                    if url:
+                        existing_urls.add(url)
+                        self._documents[row["id"]] = {
+                            "id": row["id"],
+                            "title": row.get("title", ""),
+                            "source_url": url,
+                            "source_domain": row.get("source_domain", ""),
+                            "summary": row.get("summary", ""),
+                            "metadata": {},
+                            "created_at": row.get("created_at", ""),
+                            "chunks_count": 1,
+                        }
+            except Exception as e:
+                logger.debug(f"Seed pre-check notice: {e}")
+
+        seeded_count = 0
         for item in verified_seeds:
+            if item["source_url"] in existing_urls:
+                continue
             await self.index_document(
                 title=item["title"],
                 source_url=item["source_url"],
@@ -157,8 +182,9 @@ class RAGService:
                 content=item["content"],
                 summary=item["summary"]
             )
+            seeded_count += 1
         self._seeded = True
-        logger.info(f"Seeded {len(verified_seeds)} verified healthcare educational documents.")
+        logger.info(f"Knowledge base ready ({seeded_count} newly seeded, {len(existing_urls)} already in Supabase).")
 
     async def index_document(
         self,

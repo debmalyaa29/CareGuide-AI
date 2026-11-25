@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field
+from pydantic import Field, field_validator
 
 
 class Settings(BaseSettings):
@@ -9,6 +9,22 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
+    @field_validator(
+        "GEMINI_API_KEY",
+        "FIRECRAWL_API_KEY",
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_DB_URL",
+        mode="before",
+        check_fields=False,
+    )
+    @classmethod
+    def strip_quotes(cls, v: Optional[str]) -> Optional[str]:
+        if isinstance(v, str):
+            return v.strip().strip('"').strip("'").strip()
+        return v
 
     # Server settings
     PORT: int = 8000
