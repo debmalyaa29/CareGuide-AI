@@ -21,6 +21,57 @@ import { api } from '@/lib/api';
 import { ChatMessage, Citation, MedicalTerm } from '@/types';
 import { AuthGuard } from '@/components/AuthGuard';
 
+function renderInlineMarkdown(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+      return <strong key={idx} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={idx} className="italic text-slate-600">{part.slice(1, -1)}</em>;
+    }
+    if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+      return <code key={idx} className="px-1 py-0.5 rounded bg-slate-100 text-xs font-mono text-brand-800">{part.slice(1, -1)}</code>;
+    }
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
+  });
+}
+
+function FormattedMessage({ content }: { content: string }) {
+  const lines = content.split('\n');
+  return (
+    <div className="text-sm text-slate-800 leading-relaxed space-y-2 font-normal">
+      {lines.map((rawLine, i) => {
+        const line = rawLine.trim();
+        if (!line) return <div key={i} className="h-1" />;
+        if (line === '---' || line === '***') {
+          return <hr key={i} className="my-3 border-slate-200" />;
+        }
+        if (line.startsWith('#### ')) {
+          return <h4 key={i} className="text-sm font-bold text-slate-900 pt-2">{renderInlineMarkdown(line.slice(5))}</h4>;
+        }
+        if (line.startsWith('### ')) {
+          return <h3 key={i} className="text-base font-bold text-slate-900 pt-2">{renderInlineMarkdown(line.slice(4))}</h3>;
+        }
+        if (line.startsWith('## ') || line.startsWith('# ')) {
+          const text = line.replace(/^#{1,2}\s+/, '');
+          return <h2 key={i} className="text-lg font-bold text-slate-900 pt-1">{renderInlineMarkdown(text)}</h2>;
+        }
+        if (line.startsWith('- ') || line.startsWith('* ') || line.startsWith('• ')) {
+          const text = line.replace(/^[-*•]\s+/, '');
+          return (
+            <div key={i} className="flex items-start gap-2 pl-2">
+              <span className="text-brand-600 font-bold mt-0.5">•</span>
+              <span>{renderInlineMarkdown(text)}</span>
+            </div>
+          );
+        }
+        return <p key={i}>{renderInlineMarkdown(line)}</p>;
+      })}
+    </div>
+  );
+}
+
 function ChatContent() {
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get('prompt') || '';
@@ -264,9 +315,7 @@ function ChatContent() {
                   )}
 
                   {/* Main Response Markdown Body */}
-                  <div className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap font-normal">
-                    {msg.content}
-                  </div>
+                  <FormattedMessage content={msg.content} />
 
                   {/* Medical Terms Simplified Cards */}
                   {msg.medical_terms && msg.medical_terms.length > 0 && (
