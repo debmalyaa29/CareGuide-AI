@@ -1,18 +1,20 @@
 services:
+  # 1. FastAPI Backend Service
   - type: web
     name: careguide-ai-backend
-    env: python
+    runtime: python
     region: oregon
     plan: free
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12
       - key: ENVIRONMENT
         value: production
       - key: CORS_ORIGINS
-        value: "http://localhost:3000,https://careguide-ai.vercel.app"
+        value: "*"
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
@@ -29,3 +31,22 @@ services:
         sync: false
       - key: MEMENTO_MEMORY_STORE
         value: postgres_supabase
+
+  # 2. Next.js Frontend Service
+  - type: web
+    name: careguide-ai-frontend
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
